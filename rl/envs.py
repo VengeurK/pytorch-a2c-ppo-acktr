@@ -22,14 +22,29 @@ try:
 except ImportError:
     pass
 
+try:
+    import minecraft.environment
+except ImportError:
+    print('Cannot import minecraft env')
+    pass
+
 
 def make_env(env_id, seed, rank, log_dir, add_timestep):
+    env_mc = None
+    if env_id.startswith('mc'):
+        _, env_name = env_id.split('.')
+        env_mc = minecraft.environment.MinecraftEnv(env_name)
     def _thunk():
-        if env_id.startswith("dm"):
-            _, domain, task = env_id.split('.')
-            env = dm_control2gym.make(domain_name=domain, task_name=task)
+        if env_mc:
+            env_mc.init_spaces()
+            env = env_mc
         else:
-            env = gym.make(env_id)
+            if env_id.startswith("dm"):
+                _, domain, task = env_id.split('.')
+                env = dm_control2gym.make(domain_name=domain, task_name=task)
+            else:
+                env = gym.make(env_id)
+
         is_atari = hasattr(gym.envs, 'atari') and isinstance(
             env.unwrapped, gym.envs.atari.atari_env.AtariEnv)
         if is_atari:
