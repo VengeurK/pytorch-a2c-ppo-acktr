@@ -10,16 +10,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from arguments import get_args
+from rl.arguments import get_args
 from baselines.common.vec_env.dummy_vec_env import DummyVecEnv
 from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
 from baselines.common.vec_env.vec_normalize import VecNormalize
-from envs import make_env
-from model import Policy
-from storage import RolloutStorage
-from visualize import visdom_plot
+from rl.envs import make_env
+from rl.model import Policy
+from rl.storage import RolloutStorage
+from rl.visualize import visdom_plot
 
-import algo
+import rl.algo as algo
 
 args = get_args()
 
@@ -69,7 +69,7 @@ def main():
     obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
 
     actor_critic = Policy(obs_shape, envs.action_space, args.recurrent_policy)
-    
+
     if envs.action_space.__class__.__name__ == "Discrete":
         action_shape = 1
     else:
@@ -156,7 +156,7 @@ def main():
         rollouts.compute_returns(next_value, args.use_gae, args.gamma, args.tau)
 
         value_loss, action_loss, dist_entropy = agent.update(rollouts)
-        
+
         rollouts.after_update()
 
         if j % args.save_interval == 0 and args.save_dir != "":
