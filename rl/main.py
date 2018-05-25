@@ -41,8 +41,10 @@ except OSError:
     for f in files:
         os.remove(f)
 
+def default_policy(obs_shape, act_space, recurrent):
+    return Policy(obs_shape, act_space, recurrent)
 
-def main():
+def main(policy_generator=default_policy):
     print("#######")
     print("WARNING: All rewards are clipped or normalized so you need to use a monitor (see envs.py) or visdom plot to get true rewards")
     print("#######")
@@ -68,7 +70,7 @@ def main():
     obs_shape = envs.observation_space.shape
     obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
 
-    actor_critic = Policy(obs_shape, envs.action_space, args.recurrent_policy)
+    actor_critic = policy_generator(obs_shape, envs.action_space, args.recurrent_policy)
 
     if envs.action_space.__class__.__name__ == "Discrete":
         action_shape = 1
