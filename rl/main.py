@@ -64,8 +64,8 @@ def main(policy_generator=default_policy):
     else:
         envs = DummyVecEnv(envs)
 
-    if len(envs.observation_space.shape) == 1:
-        envs = VecNormalize(envs)
+    #if len(envs.observation_space.shape) == 1:
+    #    envs = VecNormalize(envs)
 
     obs_shape = envs.observation_space.shape
     obs_shape = (obs_shape[0] * args.num_stack, *obs_shape[1:])
