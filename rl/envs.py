@@ -32,8 +32,11 @@ except ImportError:
 def make_env(env_id, seed, rank, log_dir, add_timestep):
     env_mc = None
     if env_id.startswith('mc'):
-        _, env_name = env_id.split('.')
-        env_mc = minecraft.environment.MinecraftEnv(env_name)
+        split = env_id.split('.')
+        if len(split) == 2:
+            env_mc = minecraft.environment.MinecraftEnv(split[1])
+        if len(split) == 3:
+            env_mc = minecraft.environment.MinecraftEnv(split[1], split[2])
     def _thunk():
         if env_mc:
             env_mc.init_spaces()
