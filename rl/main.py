@@ -198,4 +198,7 @@ def main(policy_generator=default_policy):
                 pass
 
 if __name__ == "__main__":
-    main()
+    if args.load:
+        main(lambda _: torch.load(args.load))
+    else:
+        main()
