@@ -45,6 +45,9 @@ def default_policy(obs_shape, act_space, recurrent):
     return Policy(obs_shape, act_space, recurrent)
 
 def main(policy_generator=default_policy):
+    if args.load:
+        print("loading %s" % args.load)
+        policy_generator = lambda _: torch.load(args.load)
     print("#######")
     print("WARNING: All rewards are clipped or normalized so you need to use a monitor (see envs.py) or visdom plot to get true rewards")
     print("#######")
@@ -198,7 +201,4 @@ def main(policy_generator=default_policy):
                 pass
 
 if __name__ == "__main__":
-    if args.load:
-        main(lambda _: torch.load(args.load))
-    else:
-        main()
+    main()
