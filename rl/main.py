@@ -44,7 +44,10 @@ except OSError:
 def default_policy(obs_shape, act_space, recurrent):
     return Policy(obs_shape, act_space, recurrent)
 
-def main(policy_generator=default_policy):
+def default_states_initializer(policy, actor_id):
+    return torch.zeros(policy.state_size)
+
+def main(policy_generator=default_policy, states_initializer=default_states_initializer):
     if args.load:
         print("loading %s" % args.load)
         policy_generator = lambda obs_shape, act_space, recurrent: torch.load(args.load)
@@ -98,6 +101,8 @@ def main(policy_generator=default_policy):
                                args.entropy_coef, acktr=True)
 
     rollouts = RolloutStorage(args.num_steps, args.num_processes, obs_shape, envs.action_space, actor_critic.state_size)
+    for actor in range(args.num_processes):
+        rollouts.states[0, actor] = states_initializer(actor_critic, actor)
     current_obs = torch.zeros(args.num_processes, *obs_shape)
 
     def update_current_obs(obs):
@@ -151,6 +156,9 @@ def main(policy_generator=default_policy):
                 current_obs *= masks
 
             update_current_obs(obs)
+            for actor in range(args.num_processes):
+                if done[actor]:
+                    states[actor] = states_initializer(actor_critic, actor)
             rollouts.insert(current_obs, states, action, action_log_prob, value, reward, masks)
 
         with torch.no_grad():
