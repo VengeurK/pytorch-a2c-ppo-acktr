@@ -34,9 +34,9 @@ def make_env(env_id, seed, rank, log_dir, add_timestep):
     if env_id.startswith('mc'):
         split = env_id.split('.')
         if len(split) == 2:
-            env_mc = minecraft.environment.MinecraftEnv(split[1])
+            env_mc = minecraft.environment.MinecraftEnv(split[1], actor_id=rank)
         if len(split) == 3:
-            env_mc = minecraft.environment.MinecraftEnv(split[1], split[2])
+            env_mc = minecraft.environment.MinecraftEnv(split[1], split[2], actor_id=rank)
     def _thunk():
         if env_mc:
             env_mc.init_spaces()
